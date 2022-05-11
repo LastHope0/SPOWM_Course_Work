@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Drive">
+    <Position X="8.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CIAAAAAAAAAgAgCAAGAAAACAAAAAgAAgAAAAAAAQgAA=</HashCode>
+      <FileName>Drive.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MFT">
+    <Position X="10.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAgAAAAAAAAACAACCAAIAAGBAAAAAAAQggAAEQgAA=</HashCode>
+      <FileName>MFT.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MftRecord">
+    <Position X="4" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACQAACAiAAAAIACAAACgAAAARAAAAABIIAkAIEAgCA=</HashCode>
+      <FileName>MftRecord.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Controller">
+    <Position X="7" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAQEgAAAgAAABAgAAAAAAAAAAAAgAEACABAQ=</HashCode>
+      <FileName>Controller.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="BIOS_PARAMETER_BLOCK" Collapsed="true">
+    <Position X="10.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAACQAAAAIAAEAAAQAQAAAAECAQABAgA=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="NTFS_BOOT_SECTOR" Collapsed="true">
+    <Position X="10.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACiAAEAAAQAAAJBAABAAAAAAIQAAAAAgABAIIAAEA=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="MFT_RECORD_DATA_NODE" Collapsed="true">
+    <Position X="7" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAEAAAAAAAAAACAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="MFT_RECORD_HEADER" Collapsed="true">
+    <Position X="8.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQCAABEAAAQIAAIAAAAAAgAAAEAAAAIAiACAAAQ=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ATTR_RECORD_HEADER" Collapsed="true">
+    <Position X="8.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAAEAEAAAAgAAABBAAAAAAIAAAAAAQQ=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ATTR_LIST_REC" Collapsed="true">
+    <Position X="7" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAAAEAACAAAAAAAgAABAAgAAAAAAAAgA=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="RootPath" Collapsed="true">
+    <Position X="7" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAABAAAABAAAAAAAA=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Typedef Name="MFT_RECORD_FLAGS" Collapsed="true">
+    <Position X="4.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ATTR_TYPES" Collapsed="true">
+    <Position X="0.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ATTR_FLAGS" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Enum Name="__unnamed_enum_066f_1" Collapsed="true">
+    <Position X="4.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAEAAAAAABAAAAAAAAAQAAA=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_066f_2" Collapsed="true">
+    <Position X="0.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAEAAAAAAAAIAQBAABAgAABABAAAAAAAEAAAgIAAAA=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_066f_3" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>NTFS_DATA_STRUCTURES.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
