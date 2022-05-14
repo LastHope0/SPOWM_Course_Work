@@ -5,7 +5,6 @@ bool Drive::parseVBR() {
 	NTFS_BOOT_SECTOR vbr = {};
 	DWORD readedBytes;
 	if (!ReadFile(hDrive, &vbr, sizeof(NTFS_BOOT_SECTOR), &readedBytes, NULL) || readedBytes != sizeof(NTFS_BOOT_SECTOR)) {
-		//when reading from a disk drive, the maximum number of bytes to be read has to be a multiple of sector size
 		std::cout << "[!] Couldn't read the VBR" << std::endl;
 		return false;
 	}
@@ -54,67 +53,76 @@ bool Drive::setFilePointer(LARGE_INTEGER distanceToMove, DWORD moveMethod, LARGE
 		*newFilePointer = lNewFilePointer;
 	return true;
 }
-
+MftRecord Drive::readMftRec(LARGE_INTEGER offset)
+{
+	if (!setFilePointer(offset, FILE_BEGIN, NULL))
+	{
+		std::cout << "[!] Can't move to " << offset.QuadPart << " MFT record" << std::endl;
+		return MftRecord();
+	}
+	return mft.readMftRec(hDrive, offset);
+}
 bool Drive::recoverFile(std::list<MFT_RECORD_DATA_NODE> data, std::wstring name, std::filesystem::path p)
 {
 	std::ofstream f;
 	std::filesystem::path tempPath = p;
-	if (name.empty())
-	{
-		std::cout << "Can't get file name" << std::endl;
-		return false;
-	}
 	tempPath /= name;
+
 	int i = 0;
 	while (std::filesystem::exists(tempPath))
 	{
-		tempPath = p / name;
-		tempPath += std::to_wstring(i);
+		i++;
+		tempPath = p;
+		tempPath /= std::wstring(L"(") + std::to_wstring(i) + std::wstring(L")");
+		tempPath += name;
 	}
 	
 	f.open(tempPath.c_str(), std::ios_base::out | std::ios_base::binary);
 	if (!f.is_open() || !f.good())
 	{
-		std::cout << "[!] Can't create file" << std::endl;
+		std::cout << "[!] Can't recover \"";
+		std::wcout << name;
+		std::cout<< "\" file" << std::endl;
 		return false;
 	}
 	if (data.empty())
 	{
-		std::cout << "[!] Can't get data from record" << std::endl;
+		std::cout << "[!] Can't get data from \"";
+		std::wcout << name;
+		std::cout << "\" record" << std::endl;
 		return false;
 	}
 	LARGE_INTEGER readedBytes = {0};
-	DWORD bytesInBuffer = 0, bytesToRead = 0;
-	DWORD n = this->mft.getBytesPerSector() * 1000;
-	char* buffer = new char[n];
+	DWORD bytesInBuffer = 0, bytesToWrite = 0;
+	DWORD bufferSize = this->mft.getBytesPerSector() * 1000;
+	char* buffer = new char[bufferSize];
 	for (auto it = data.begin(), end = data.end(); it != end; it++)
 	{
 		readedBytes.QuadPart = 0;
 		if (!setFilePointer(it->offset, FILE_BEGIN, NULL))
 		{
-			std::cout << "[!] Can't write data" << std::endl;
+			std::cout << "[!] Can't write \"";
+			std::wcout << name;
+			std::cout << "\" data" << std::endl;
 			return false;
 		}
 		while (readedBytes.QuadPart < it->len.QuadPart)
 		{
-			if (it->len.QuadPart - readedBytes.QuadPart < n)
-				bytesToRead = it->len.QuadPart - readedBytes.QuadPart;
+			if (it->len.QuadPart - readedBytes.QuadPart < bufferSize)
+				bytesToWrite = it->len.QuadPart - readedBytes.QuadPart;
 			else
-				bytesToRead = n;
+				bytesToWrite = bufferSize;
 
-			if (!ReadFile(hDrive, buffer, bytesToRead, &bytesInBuffer, NULL) || bytesInBuffer != bytesToRead) {
-				//when reading from a disk drive, the maximum number of bytes to be read has to be a multiple of sector size
-				std::cout << "[!] Couldn't read the record data" << std::endl;
+			if (!ReadFile(hDrive, buffer, bufferSize, &bytesInBuffer, NULL) || bytesInBuffer != bufferSize) {
+				std::cout << "[!] Couldn't read the \"";
+				std::wcout << name;
+				std::cout << "\" record data" << std::endl;
 				return false;
 			}
-			readedBytes.QuadPart += bytesInBuffer;
-
-			f.write(buffer, bytesInBuffer);
-
+			readedBytes.QuadPart += bytesToWrite;
+			f.write(buffer + it->startByte, bytesToWrite);
 		}
-
 	}
-
 	f.close();
 	return true;
 }

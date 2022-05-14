@@ -26,7 +26,6 @@ bool MftRecord::checkAndRecoverMarkers()
 }
 
 USHORT MftRecord::findAttributeHeaderOffset(const DWORD attributeTypeCode) const{
-	//retrieve the first attribute header offset from the MFT entry header
 	if (isClear())
 		throw std::bad_weak_ptr();
 	USHORT attributeHeaderOffset = 0;
@@ -36,17 +35,16 @@ USHORT MftRecord::findAttributeHeaderOffset(const DWORD attributeTypeCode) const
 	memcpy(&currentAttributeTypeCode, body + attributeHeaderOffset, sizeof(DWORD));
 
 	DWORD attributeSize;
-	//while the current attribute type code isn't the one we are looking for and isn't the one that indicates the end of the attributes
 	while (currentAttributeTypeCode != attributeTypeCode && currentAttributeTypeCode != ATTR_TYPES::AT_END) {
 		attributeSize = 0;
 		memcpy(&attributeSize, body + attributeHeaderOffset + 0x04, sizeof(DWORD));
 
-		attributeHeaderOffset += attributeSize; //move to the next attribute
+		attributeHeaderOffset += attributeSize; 
 		currentAttributeTypeCode = 0;
-		memcpy(&currentAttributeTypeCode, body + attributeHeaderOffset, sizeof(DWORD)); //retrieve the next attribute type code
+		memcpy(&currentAttributeTypeCode, body + attributeHeaderOffset, sizeof(DWORD)); 
 	}
 
-	if (currentAttributeTypeCode == ATTR_TYPES::AT_END) { //if there is no attribute of attributeType
+	if (currentAttributeTypeCode == ATTR_TYPES::AT_END) { 
 		return 0;
 	}
 	return attributeHeaderOffset;
@@ -55,7 +53,7 @@ USHORT MftRecord::findAttributeHeaderOffset(const DWORD attributeTypeCode) const
 std::wstring MftRecord::getName()const{
 	std::wstring namestr;
 	USHORT fileNameAttributeHeaderOffset = findAttributeHeaderOffset(ATTR_TYPES::AT_FILE_NAME);
-	if (fileNameAttributeHeaderOffset == 0) { //if there is no $FILE_NAME attribute in the MFT entry
+	if (fileNameAttributeHeaderOffset == 0) {
 		return namestr;
 	}
 	ATTR_RECORD_HEADER* attrHeader = (ATTR_RECORD_HEADER*)(body + fileNameAttributeHeaderOffset);
@@ -76,7 +74,7 @@ RootPath MftRecord::getRootPathInd() const
 	RootPath rootPath = { 0 };
 	LARGE_INTEGER root = { 0 };
 	USHORT fileNameAttributeHeaderOffset = findAttributeHeaderOffset(ATTR_TYPES::AT_FILE_NAME);
-	if (fileNameAttributeHeaderOffset == 0) { //if there is no $FILE_NAME attribute in the MFT entry
+	if (fileNameAttributeHeaderOffset == 0) { 
 		return rootPath;
 	}
 	ATTR_RECORD_HEADER* attrHeader = (ATTR_RECORD_HEADER*)(body + fileNameAttributeHeaderOffset);
@@ -98,18 +96,20 @@ if (fileDataAttributeHeaderOffset == 0) {
 	ATTR_RECORD_HEADER* attrHeader = (ATTR_RECORD_HEADER*)(body + fileDataAttributeHeaderOffset);
 	if (isResident(fileDataAttributeHeaderOffset))
 	{
-		node.highest_vcn = { 0 };
-		node.lowest_vcn = { 0 };
-		node.offset.QuadPart = offset.QuadPart + fileDataAttributeHeaderOffset + attrHeader->u.r.value_offset;
+		node.startByte = fileDataAttributeHeaderOffset + attrHeader->u.r.value_offset;
+		node.offset.QuadPart = this->offset.QuadPart;
 		node.len.QuadPart = attrHeader->u.r.value_length;
+		node.lowest_vcn = { 0 };
+		node.highest_vcn = { attrHeader->u.r.value_length };
 		data.push_back(node);
 	}
 	else
 	{
 		LARGE_INTEGER tempOffsetToData = {0};
 		USHORT offsetOfData = fileDataAttributeHeaderOffset + attrHeader->u.nr.mapping_pairs_offset;		// смещение списка серий
-		byte numOfLcnBytes = (body[offsetOfData] & 0xF0) >> 4;							//retrieve the upper nibble of the value size tuple
-		byte numOfLenBytes = body[offsetOfData] & 0x0F;	//retrieve the lower nibble of the value size tuple
+		byte numOfLenBytes = body[offsetOfData] & 0x0F;	
+		byte numOfLcnBytes = (body[offsetOfData] & 0xF0) >> 4;					
+		node.startByte = 0;
 		node.lowest_vcn.QuadPart = 0;
 		while (numOfLcnBytes && numOfLenBytes)
 		{

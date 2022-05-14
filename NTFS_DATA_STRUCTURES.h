@@ -50,6 +50,7 @@ typedef enum {
 
  struct MFT_RECORD_DATA_NODE
 {
+	 DWORD startByte = 0;			// bytes, used only in resident data
 	LARGE_INTEGER offset;		// bytes
 	LARGE_INTEGER len;			// bytes
 	ULARGE_INTEGER lowest_vcn;	// bytes

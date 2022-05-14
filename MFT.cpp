@@ -24,7 +24,7 @@ MftRecord MFT::readMftRec(HANDLE hDrive, LARGE_INTEGER offset)
 	byte* buffer = new byte[bytesPerMftRecord];
 	DWORD readedBytes = 0;
 	if (!ReadFile(hDrive, buffer, bytesPerMftRecord, &readedBytes, NULL) || readedBytes != bytesPerMftRecord) {
-		std::cout << "[!] Couldn't read MFT record" << std::endl;
+		std::cout << "[!] Couldn't read "<<offset.QuadPart <<" MFT record" << std::endl;
 		return mftRec;
 	}
 	

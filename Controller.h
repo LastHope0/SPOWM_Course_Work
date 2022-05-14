@@ -1,5 +1,5 @@
 #pragma once
-#define FLAGS_COUNT 2
+#define FLAGS_COUNT 1
 #include "Drive.h"
 
 class Controller
@@ -26,6 +26,6 @@ public:
 	bool parseCommandLine();
 	bool start();
 	
-	std::list<LARGE_INTEGER> findFilesInDirectory(Drive drive, RootPath curPathInd);
+	std::list<LARGE_INTEGER> findDeletedFilesInDirectory(Drive drive, RootPath curPathInd);
 };
 
