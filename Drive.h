@@ -25,9 +25,10 @@ public:
 		drivePath = drive.drivePath;
 		mft = drive.mft;
 	}
-	~Drive() { CloseHandle(hDrive); }
+	~Drive() {  }
 
 	bool open();
+	bool close() {return CloseHandle(hDrive);}
 	bool parseVBR();
 	bool parseMftTable() { return mft.initMftTable(hDrive); }
 	bool setFilePointer(LARGE_INTEGER bytes, DWORD moveMethod, LARGE_INTEGER* newFilePointer);

@@ -1,7 +1,6 @@
 #include "Controller.h"
 
 int main(int argc, char* argv[]) {
-	system("chcp 1251 & cls");
 	try {
 		Controller controller(argc, argv);
 		if (controller.isHelp()) return 0;

@@ -40,7 +40,7 @@ public:
 	~MftRecord(){ delete[]body; }
 
 	bool isClear() const { return body == nullptr; }
-	bool isDeleted() const { return mftRecHead->flags == MFT_RECORD_FLAGS::MFT_RECORD_NOT_USED; }
+	bool isDeleted() const { return mftRecHead->flags == MFT_RECORD_FLAGS::MFT_RECORD_NOT_USED || mftRecHead->flags == (MFT_RECORD_FLAGS::MFT_RECORD_NOT_USED | MFT_RECORD_FLAGS::MFT_RECORD_IS_DIRECTORY); }
 	bool isDirectory() const { return mftRecHead->flags == MFT_RECORD_FLAGS::MFT_RECORD_IS_DIRECTORY; }
 	bool isValidMftEntry() const { return body[0x0] == 0x46 && body[0x1] == 0x49 && body[0x2] == 0x4c && body[0x3] == 0x45; }
 	bool isResident(USHORT attrHeaderOffset) const { 	return !body[attrHeaderOffset + 0x08] ; }

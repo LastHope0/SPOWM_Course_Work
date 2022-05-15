@@ -1,5 +1,5 @@
 #pragma once
-#define FLAGS_COUNT 1
+#define FLAGS_COUNT 2
 #include "Drive.h"
 
 class Controller
@@ -8,7 +8,7 @@ class Controller
 	char** argv;
 
 	bool mkp;
-	bool all;
+	bool show;
 	
 	std::filesystem::path deletedFilePath;
 	std::filesystem::path recoveredFilePath;
@@ -19,7 +19,7 @@ public:
 		this->argc = argc;
 		this->argv = argv;
 		mkp = false;
-		all = false;
+		show = false;
 	}
 	~Controller() = default;
 	bool isHelp();

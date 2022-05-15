@@ -80,7 +80,7 @@ RootPath MftRecord::getRootPathInd() const
 	ATTR_RECORD_HEADER* attrHeader = (ATTR_RECORD_HEADER*)(body + fileNameAttributeHeaderOffset);
 	
 	memcpy(&root, body + fileNameAttributeHeaderOffset + attrHeader->u.r.value_offset + 0, 8);
-	rootPath.seq_num = root.QuadPart >> 6;
+	rootPath.seq_num = root.QuadPart >> 48;
 	rootPath.rootPath_id.QuadPart = root.QuadPart & 0x0000ffffffffffff;
 	return rootPath;
 }
