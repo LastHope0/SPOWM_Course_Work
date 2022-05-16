@@ -15,6 +15,7 @@ class MftRecord
 	DWORD bytesPerCluster;
 	DWORD bytesPerMftRecord;
 	LARGE_INTEGER offset;
+	USHORT findAttributeHeaderOffset(const DWORD attributeType) const;
 public:
 	MftRecord()
 	{
@@ -49,7 +50,6 @@ public:
 	std::wstring getName() const;
 	RootPath getRootPathInd() const;
 	USHORT getSeqNum() const { return mftRecHead->sequence_number; };
-	USHORT findAttributeHeaderOffset(const DWORD attributeType) const;
 
 	std::list<MFT_RECORD_DATA_NODE> getData();
 	MftRecord& operator=(const MftRecord& mftRec)

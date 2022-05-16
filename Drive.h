@@ -25,7 +25,7 @@ public:
 		drivePath = drive.drivePath;
 		mft = drive.mft;
 	}
-	~Drive() {  }
+	~Drive() = default;
 
 	bool open();
 	bool close() {return CloseHandle(hDrive);}

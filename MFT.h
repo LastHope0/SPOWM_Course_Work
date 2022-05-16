@@ -20,7 +20,7 @@ public:
 		this->mftOffset = { 0 };
 	}
 	MFT(const MFT& mft) { *this = mft; }
-	~MFT() {}
+	~MFT() = default;
 
 	bool initMftTable(HANDLE hDrive);
 	

@@ -9,8 +9,12 @@ bool Controller::parseCommandLine()
 	}
 	deletedFilePath = argv[1];
 	recoveredFilePath = argv[2];
-
-	std::string keys[] = { "-mkp", "-show"};
+	if (!strcmp(argv[2],"-show"))
+	{
+		show = true;
+		return true;
+	}
+	std::string keys[] = { "-mkp"};
 	for (int i = 3; i < argc; i++)
 	{
 		bool goodKey = false;
@@ -19,13 +23,17 @@ bool Controller::parseCommandLine()
 			{
 				switch (j)
 				{
-				case 0: mkp = true; break; case 1: show = true; break;
+				case 0: mkp = true; break;
 				}
 				goodKey = true;
 			}
 		if (!goodKey)
 		{
-			std::cout << "[!] Wrong parameters: Unknown key \"" << argv[i] << "\"" << std::endl << "Add key \"--help\" for help" << std::endl;
+			if (!strcmp(argv[i], "-show") || !strcmp(argv[i], "--help"))
+				std::cout << "Key \"" << argv[i] << "\" should be instead [OPTION2]" << std::endl;
+			else
+				std::cout << "[!] Wrong parameters: Unknown key \"" << argv[i] << "\"" << std::endl;
+			std::cout<< "Add key \"--help\" for help" << std::endl;
 			return false;
 		}
 	}
@@ -75,7 +83,7 @@ bool Controller::start()
 	else
 		std::cout << "[*] Recovering deleted files ..." << std::endl;
 	bool found = false;
-	for (LARGE_INTEGER i = { 39 }, end = drive.mft.recordsInMft(); i.QuadPart < end.QuadPart; i.QuadPart++)
+	for (LARGE_INTEGER i = { 16 }, end = drive.mft.recordsInMft(); i.QuadPart < end.QuadPart; i.QuadPart++)
 	{
 		MftRecord rec = drive.readMftRec(drive.mft.getOffsetMftRec(i));
 		if (rec.isClear() || !rec.getSeqNum() || !rec.isValidMftEntry() || !rec.checkAndRecoverMarkers()) continue;
@@ -89,7 +97,8 @@ bool Controller::start()
 			{
 				if (show)
 				{
-					std::wcout << L"\t" << name << std::endl;
+					std::wcout << name << std::endl;
+					std::wcout.clear();
 					continue;
 				}
 				data = rec.getData();
@@ -191,7 +200,7 @@ bool Controller::isHelp()
 		std::cout << " [OPTION2] - path for recovered files" << std::endl << std::endl;
 		std::cout << "KEYS" << std::endl << std::endl;
 		std::cout << " --help - output user manual" << std::endl;
-		std::cout << " -show - only show files name" << std::endl;
+		std::cout << " -show - only show files names" << std::endl;
 		std::cout << " -mkp - make path. Ñreates a recovery path if it does not exist" << std::endl << std::endl;
 		return true;
 	}
@@ -202,7 +211,7 @@ bool Controller::isHelp()
 std::list<LARGE_INTEGER> Controller::findDeletedFilesInDirectory(Drive drive, RootPath curPathInd)
 {
 	std::list<LARGE_INTEGER> ind_list;
-	for (LARGE_INTEGER i = {39 }, end = drive.mft.recordsInMft(); i.QuadPart < end.QuadPart; i.QuadPart++)
+	for (LARGE_INTEGER i = { 16 }, end = drive.mft.recordsInMft(); i.QuadPart < end.QuadPart; i.QuadPart++)
 	{
 		MftRecord rec = drive.readMftRec(drive.mft.getOffsetMftRec(i));
 		if (rec.isClear() || !rec.isValidMftEntry() || !rec.checkAndRecoverMarkers()) continue;
