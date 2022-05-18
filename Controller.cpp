@@ -7,15 +7,29 @@ bool Controller::parseCommandLine()
 		std::cout << "[!] Wrong parameters." << std::endl << "Add key \"--help\" for help" << std::endl;
 		return false;
 	}
-	deletedFilePath = argv[1];
-	recoveredFilePath = argv[2];
-	if (!strcmp(argv[2],"-show"))
+	const char invalidSym[] = ":*?«<>|.";
+	int i = 1;
+	deletedFilePath = argv[i++];
+	for (; argv[i] && !strpbrk(argv[i], invalidSym)  && strcmp("-show", argv[i]) && strcmp("-mkp", argv[i]); i++)
+	{
+		deletedFilePath += " ";
+		deletedFilePath += argv[i];
+	}
+	if(argv[i] && strcmp("-show", argv[i]) && strcmp("-mkp", argv[i]))
+		recoveredFilePath = argv[i++];
+	for (; argv[i] && !strpbrk(argv[i], invalidSym) &&  strcmp("-show", argv[i]) && strcmp("-mkp", argv[i]); i++)
+	{
+		recoveredFilePath += " ";
+		recoveredFilePath += argv[i];
+	}
+		
+	if (argv[i] && !strcmp(argv[i], "-show"))
 	{
 		show = true;
 		return true;
 	}
-	std::string keys[] = { "-mkp"};
-	for (int i = 3; i < argc; i++)
+	std::string keys[] = { "-mkp" };
+	for (; i < argc; i++)
 	{
 		bool goodKey = false;
 		for (int j = 0; j < FLAGS_COUNT; j++)
@@ -33,7 +47,7 @@ bool Controller::parseCommandLine()
 				std::cout << "Key \"" << argv[i] << "\" should be instead [OPTION2]" << std::endl;
 			else
 				std::cout << "[!] Wrong parameters: Unknown key \"" << argv[i] << "\"" << std::endl;
-			std::cout<< "Add key \"--help\" for help" << std::endl;
+			std::cout << "Add key \"--help\" for help" << std::endl;
 			return false;
 		}
 	}
@@ -79,39 +93,28 @@ bool Controller::start()
 	std::cout << "[*] Parsing MFT data" << std::endl;
 	if (!drive.parseMftTable()) return false;
 
-	if (show) std::cout << "[*] Deleted files : "  << std::endl;
+	if (show) std::cout << "[*] Deleted files : " << std::endl;
 	else
 		std::cout << "[*] Recovering deleted files ..." << std::endl;
+	readMftTable(drive);
+	std::cout << "[*] Closing D: drive handle..." << std::endl;
+	drive.close();
+	return true;
+}
+
+bool Controller::readMftTable(Drive& drive)
+{
 	bool found = false;
 	for (LARGE_INTEGER i = { 16 }, end = drive.mft.recordsInMft(); i.QuadPart < end.QuadPart; i.QuadPart++)
 	{
 		MftRecord rec = drive.readMftRec(drive.mft.getOffsetMftRec(i));
 		if (rec.isClear() || !rec.getSeqNum() || !rec.isValidMftEntry() || !rec.checkAndRecoverMarkers()) continue;
-
 		std::wstring name = rec.getName();
 		if (name.empty()) continue;
-		std::list<MFT_RECORD_DATA_NODE> data;
 		if (deletedFilePath.string().size() == 3)
 		{
-			if (rec.isDeleted() && !rec.isDirectory())
-			{
-				if (show)
-				{
-					std::wcout << name << std::endl;
-					std::wcout.clear();
-					continue;
-				}
-				data = rec.getData();
-				if (data.empty())
-				{
-					std::cout << "[!] Can't find \"";
-					std::wcout << name;
-					std::cout << "\" file data" << std::endl;
-					continue;
-				}
-				if (drive.recoverFile(data, name, recoveredFilePath))
-					found = true;
-			}
+			if (checkAndRecoverFile(drive, name, rec))
+				found = true;
 		}
 		else
 		{
@@ -123,8 +126,6 @@ bool Controller::start()
 				rp.rootPath_id = i;
 				if (rec.isDeleted()) --rp.seq_num;
 				std::list<LARGE_INTEGER> deletedFilesInd = findDeletedFilesInDirectory(drive, rp);
-
-				std::list<MFT_RECORD_DATA_NODE> data;
 				for (auto it = deletedFilesInd.begin(), end = deletedFilesInd.end(); it != end; it++)
 				{
 					MftRecord rec = drive.readMftRec(drive.mft.getOffsetMftRec(*it));
@@ -132,57 +133,51 @@ bool Controller::start()
 
 					std::wstring name = rec.getName();
 					if (name.empty()) continue;
-					if (show)
-					{
-						std::wcout << L"\t" << name << std::endl;
-						continue;
-					}
-					data = rec.getData();
-					if (data.empty())
-					{
-						std::cout << "[!] Can't find \"";
-						std::wcout << name;
-						std::cout << "\" file data" << std::endl;
-						continue;
-					}
-					if (drive.recoverFile(data, name, recoveredFilePath))
+					if (checkAndRecoverFile(drive, name, rec))
 						found = true;
 				}
 			}
-			else
-			{
-				if (!rec.isDeleted())
-				{
-					std::cout << "[!] This is not deleted file" << std::endl;
-					break;
-				}
-				if (show)
-				{
-					std::wcout << L"\t" << name << std::endl;
-					continue;
-				}
-				data = rec.getData();
-				if (data.empty())
-				{
-					std::cout << "[!] Can't find \"";
-					std::wcout << name;
-					std::cout << "\" file data" << std::endl;
-					continue;
-				}
-				if (drive.recoverFile(data, name, recoveredFilePath))
-					found = true;
-			}
+			else if (checkAndRecoverFile(drive, name, rec))
+				found = true;
 		}
 	}
-	if(!show)
-		if (found) std::cout << "[*] The files has been recovered successfully!" << std::endl;
-		else std::cout << "[!] There aren't deleted files" << std::endl;
+	if (!show)
+		if (found)
+		{
+			std::cout << "[*] The files have been recovered successfully!" << std::endl;
+			return true;
+		}
+		else
+		{
+			std::cout << "[!] There aren't deleted files" << std::endl;
+			return false;
+		}
+}	
 
-	std::cout << "[*] Closing D: drive handle..." << std::endl;
-	drive.close();
-	return true;
+bool Controller::checkAndRecoverFile(Drive drive, std::wstring name, MftRecord rec)
+{
+	std::list<MFT_RECORD_DATA_NODE> data;
+	if (!rec.isDeleted() || rec.isDirectory()) return false;
+
+	if (show)
+	{
+		std::wcout << name << std::endl;
+		std::wcout.clear();
+		return false;
+	}
+	data = rec.getData();
+	if (data.empty())
+	{
+		std::cout << "[!] Can't find \"";
+		std::wcout << name;
+		std::cout << "\" file data" << std::endl;
+		return false;
+	}
+	if (drive.recoverFile(data, name, recoveredFilePath))
+		return true;
+
+	return false;
 }
-
 bool Controller::isHelp()
 {
 	if (2 == argc && !strcmp(argv[1], "--help"))
@@ -227,7 +222,7 @@ std::list<LARGE_INTEGER> Controller::findDeletedFilesInDirectory(Drive drive, Ro
 			for (auto it = tmp.begin(), end = tmp.end(); it != end; it++)
 				ind_list.push_back(*it);
 		}
-		else if(rec.isDeleted()) ind_list.push_back(i);
+		else if (rec.isDeleted()) ind_list.push_back(i);
 	}
 	return ind_list;
 }

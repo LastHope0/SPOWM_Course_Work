@@ -13,6 +13,9 @@ class Controller
 	std::filesystem::path deletedFilePath;
 	std::filesystem::path recoveredFilePath;
 
+	bool checkAndRecoverFile(Drive drive, std::wstring name, MftRecord rec);
+	bool readMftTable(Drive& drive);
+
 public:
 	Controller(int argc, char* argv[])
 	{
